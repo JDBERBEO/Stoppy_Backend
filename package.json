@@ -1,0 +1,20 @@
+{
+  "name": "stoppy_Back",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/JDBERBEO/Stoppy_Backend.git",
+  "author": "Juan <jd.berbeo@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon src/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "socket.io": "^4.1.3",
+    "socket.io-client": "^4.1.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12"
+  }
+}
