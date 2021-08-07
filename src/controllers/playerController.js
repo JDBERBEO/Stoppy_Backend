@@ -9,7 +9,7 @@ module.exports = {
         const player = await Player.create(body)
         res.status(201).json('user created');
       } catch (error) {
-        res.status(400).json({ message: err.message });
+        res.status(400).json({ message: error.message });
       }
       },
     async signin(req, res) {

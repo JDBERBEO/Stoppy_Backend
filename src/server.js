@@ -15,6 +15,7 @@ const io = SocketIO(server, {
   }
 })
 
+app.use(express.json());
 app.use(morgan("dev"));
 app.use('/players', playerRouter)
 //escuchar por los eventos 
