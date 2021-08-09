@@ -1,5 +1,5 @@
 const Player= require("../models/playerModel");
-// const jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
 module.exports = {
@@ -7,7 +7,10 @@ module.exports = {
       try {
         const { body } = req
         const player = await Player.create(body)
-        res.status(201).json('user created');
+        const token = jwt.sign({ userId: player._id }, process.env.SECRET, {
+          expiresIn: 60 * 60 * 24 * 365,
+        });
+        res.status(201).json({token});
       } catch (error) {
         res.status(400).json({ message: error.message });
       }
@@ -28,11 +31,11 @@ module.exports = {
           throw new Error("Password or invalid email");
         }
   
-        // const token = jwt.sign({ userId: roomie._id }, process.env.SECRET, {
-        //   expiresIn: 60 * 60 * 24 * 365,
-        // });
+        const token = jwt.sign({ userId: player._id }, process.env.SECRET, {
+          expiresIn: 60 * 60 * 24 * 365,
+        });
   
-        res.status(201).json('user logged');
+        res.status(201).json({token});
       } catch (error) {
         console.log("ERROR", error.message);
   
