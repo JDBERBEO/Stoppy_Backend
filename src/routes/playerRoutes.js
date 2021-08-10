@@ -4,6 +4,6 @@ const { auth } = require("../utils/authMiddleware");
 
 router.route('/signup').post(playerController.signup);
 // router.route('/').get(playerController.read)
-router.route('/').post(playerController.signin);
+router.route('/signin').post(playerController.signin);
 
 module.exports = router;
