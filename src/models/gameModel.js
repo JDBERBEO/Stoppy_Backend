@@ -25,5 +25,6 @@ const playerSchema = new Schema(
     }
   })
 
+  
 const Game = model('Game', playerSchema)
 module.exports = Game
