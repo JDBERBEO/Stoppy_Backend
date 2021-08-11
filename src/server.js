@@ -21,7 +21,11 @@ app.use('/players', playerRouter)
 
 io.on('connection', socket => {
 socket.emit('welcome', { message: 'Bienvenido'})
+socket.on('roundeOne', data => {
+  console.log('data roundone', data)
 })
+})
+
 
 connect ()
 // app.get('/', () => {
