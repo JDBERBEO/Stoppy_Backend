@@ -1,7 +1,8 @@
 const { Schema, model, models } = require("mongoose");
 
-const playerSchema = new Schema( 
+const gameSchema = new Schema( 
     {
+    players: [{type: Schema.Types.ObjectId, ref: "Player"}],
     letter: {
     type: [String],
     },
@@ -26,5 +27,5 @@ const playerSchema = new Schema(
   })
 
   
-const Game = model('Game', playerSchema)
+const Game = model('Game', gameSchema)
 module.exports = Game
