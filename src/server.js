@@ -7,6 +7,8 @@ const connect = require('./database/db');
 const playerRouter = require('./routes/playerRoutes')
 const Game = require("./models/gameModel");
 const { create, findById } = require('./models/gameModel');
+const { Socket } = require('dgram');
+const jwt = require("jsonwebtoken");
 
 const port = 8000
 const app = express()
@@ -25,15 +27,25 @@ const id = 1
 io.on('connection', socket => {
 
   // let newGameId = ""
-socket.on('createGame', async({playerId}) => {
+socket.on('createGame', async({token}) => {
+    console.log('token', token)
+    const {userId} = jwt.verify(token, "" + process.env.SECRET)
+    console.log('playerid', userId)
     const newGame = await Game.create({})
-    newGame.players.push('61149874e99c45173507e871')
-    
-
+    newGame.players.push(userId)
+    await newGame.save()
+    console.log('newGame', newGame)
     const newGameId = newGame._id
+    socket.join(newGameId)
     socket.emit('gameId', newGameId)
   }
 )
+
+socket.on('joinGame', (gameId) => {
+  socket.join(gameId)
+  //agregar un socket cpara hacer un push a la base de datos del player que se une
+})
+
 
 
 // console.log('newgame por fuera de creategame', newGame)
