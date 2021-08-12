@@ -17,7 +17,7 @@ const playerSchema = new Schema(
     color: {
         type: [String],
     },
-    thing: {
+    object: {
         type: [String],
     },
     totalScorePerRound: {
