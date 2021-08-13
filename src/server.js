@@ -35,13 +35,15 @@ socket.on('createGame', async({token}) => {
     newGame.players.push(userId)
     await newGame.save()
     console.log('newGame', newGame)
-    const newGameId = newGame._id
+    const newGameId = newGame._id.toString()
     socket.join(newGameId)
     socket.emit('gameId', newGameId)
   }
 )
 
 socket.on('joinGame', (gameId) => {
+  console.log('gameId', gameId)
+  io.to(gameId).emit('joined')
   socket.join(gameId)
   //agregar un socket cpara hacer un push a la base de datos del player que se une
 })
