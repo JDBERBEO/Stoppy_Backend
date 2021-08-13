@@ -45,6 +45,14 @@ socket.on('joinGame', (gameId) => {
   console.log('gameId', gameId)
   io.to(gameId).emit('joined')
   socket.join(gameId)
+  socket.on('playerToken', async({token}) => {
+    console.log('joingame token', token)
+    const {userId} = jwt.verify(token, "" + process.env.SECRET)
+    const game = await Game.findById(gameId)
+    game.players.push(userId)
+    await game.save()
+    console.log('Game', game)
+  })
   //agregar un socket cpara hacer un push a la base de datos del player que se une
 })
 
