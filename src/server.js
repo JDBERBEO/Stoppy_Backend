@@ -6,6 +6,7 @@ const morgan = require('morgan');
 const connect = require('./database/db');
 const playerRouter = require('./routes/playerRoutes')
 const Game = require("./models/gameModel");
+const Player = require('./models/playerModel')
 const { create, findById } = require('./models/gameModel');
 const { Socket } = require('dgram');
 const jwt = require("jsonwebtoken");
@@ -23,7 +24,7 @@ app.use(express.json());
 app.use(morgan("dev"));
 app.use('/players', playerRouter)
 
-const id = 1
+
 io.on('connection', socket => {
 
   // let newGameId = ""
@@ -53,33 +54,27 @@ socket.on('joinGame', (gameId) => {
     await game.save()
     console.log('Game', game)
   })
-  //agregar un socket cpara hacer un push a la base de datos del player que se une
 })
 
 
+let gameId = ''
+socket.on('roundOne', async ({nameOne, placeOne, fruitOne, colorOne, objectOne, token }) => { 
 
-// console.log('newgame por fuera de creategame', newGame)
-// socket.emit('gameId', {gameId: Date.now()})
-
-// let gameId = ''
-// socket.on('roundOne', async (data) => { 
-//     try {
-//       console.log('data', data)
-//       const roundOne = await Round.create({data})
-//       console.log('roundOne', roundOne)
-//       roundOne.name.push(data.nameOne)
-//       roundOne.place.push(data.placeOne)
-//       roundOne.fruit.push(data.fruitOne)
-//       roundOne.color.push(data.colorOne)
-//       roundOne.object.push(data.objectOne)
-//       console.log('roundOne luego del push', roundOne)
-//       roundOne.save()
-//       console.log('Gameid', roundOne._id)
-//       gameId = roundOne._id
-//     } catch (error) {
-//       console.log(err.message);
-//     }
-// })
+    try {
+      const {userId} = jwt.verify(token, "" + process.env.SECRET)
+      const player = await Player.findById(userId)
+      console.log('player', player)
+      player.nameHeader.push(nameOne)
+      player.place.push(placeOne)
+      player.fruit.push(fruitOne)
+      player.color.push(colorOne)
+      player.object.push(objectOne)
+      console.log('player luego del push', player)
+      player.save({ validateBeforeSave: false })
+    } catch (error) {
+      console.log(error.message);
+    }
+})
 
 // socket.on('roundTwo', async (data) => { 
 //   try {

@@ -29,7 +29,28 @@ const playerSchema = new Schema(
       type: String,
       required: true, 
       match: [passwordRegExp, 'Invalid email or password'],
-    }
+    },
+    letter: {
+      type: [String],
+      },
+      nameHeader: {
+          type: [String],
+      },
+      place : {
+        type: [String],
+      },
+      fruit: {
+          type: [String],
+      },
+      color: {
+          type: [String],
+      },
+      object: {
+          type: [String],
+      },
+      totalScorePerRound: {
+          type: [Number]
+      }
   })
 
 playerSchema.pre('save', async function () {
