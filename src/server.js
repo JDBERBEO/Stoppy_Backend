@@ -46,38 +46,45 @@ socket.on('joinGame', (gameId) => {
   console.log('gameId', gameId)
   io.to(gameId).emit('joined')
   socket.join(gameId)
-  socket.on('playerToken', async({token}) => {
-    console.log('joingame token', token)
-    const {userId} = jwt.verify(token, "" + process.env.SECRET)
-    const game = await Game.findById(gameId)
-    game.players.push(userId)
-    await game.save()
-    console.log('Game', game)
-  })
 })
 
+socket.on('playerToken', async({token}) => {
+  console.log('joingame token', token)
+  const {userId} = jwt.verify(token, "" + process.env.SECRET)
+  const game = await Game.findById(gameId)
+  game.players.push(userId)
+  await game.save()
+  console.log('Game', game)
+})
 
-let gameId = ''
-socket.on('roundOne', async ({nameOne, placeOne, fruitOne, colorOne, objectOne, token }) => { 
+socket.on('rejoined', (gameId) => {
+  console.log('llego rejoined')
+  socket.join(gameId)
+})
 
-    try {
-      const {userId} = jwt.verify(token, "" + process.env.SECRET)
-      const player = await Player.findById(userId)
-      console.log('player', player)
-      player.nameHeader.push(nameOne)
-      player.place.push(placeOne)
-      player.fruit.push(fruitOne)
-      player.color.push(colorOne)
-      player.object.push(objectOne)
-      console.log('player luego del push', player)
-      player.save({ validateBeforeSave: false })
+socket.on('roundOne', async ({nameOne, placeOne, fruitOne, colorOne, objectOne, token, gameId }) => { 
+  try {
+    const {userId} = jwt.verify(token, "" + process.env.SECRET)
+    const player = await Player.findById(userId)
+    
+    player.nameHeader.push(nameOne)
+    player.place.push(placeOne)
+    player.fruit.push(fruitOne)
+    player.color.push(colorOne)
+    player.object.push(objectOne)
+    player.save({ validateBeforeSave: false })
+
+    console.log('gameId', gameId)
+    io.to(gameId).emit('stop')
+    console.log('stop')
     } catch (error) {
       console.log(error.message);
     }
 })
 
+
 // socket.on('roundTwo', async (data) => { 
-//   try {
+  //   try {
 //     const game = await Round.findById(gameId)
 //     console.log('game', game)
 //     game.name.push(data.nameTwo)
