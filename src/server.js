@@ -27,7 +27,6 @@ app.use('/players', playerRouter)
 
 io.on('connection', socket => {
 
-  // let newGameId = ""
 socket.on('createGame', async({token}) => {
     console.log('token', token)
     const {userId} = jwt.verify(token, "" + process.env.SECRET)
@@ -48,7 +47,7 @@ socket.on('joinGame', (gameId) => {
   socket.join(gameId)
 })
 
-socket.on('playerToken', async({token}) => {
+socket.on('playerToken', async({token, gameId}) => {
   console.log('joingame token', token)
   const {userId} = jwt.verify(token, "" + process.env.SECRET)
   const game = await Game.findById(gameId)
@@ -62,24 +61,25 @@ socket.on('rejoined', (gameId) => {
   socket.join(gameId)
 })
 
-socket.on('roundOne', async ({nameOne, placeOne, fruitOne, colorOne, objectOne, token, gameId }) => { 
+socket.on('round', async ({name, place, fruit, color, object, token, gameId }) => { 
   try {
     const {userId} = jwt.verify(token, "" + process.env.SECRET)
     const player = await Player.findById(userId)
     
-    player.nameHeader.push(nameOne)
-    player.place.push(placeOne)
-    player.fruit.push(fruitOne)
-    player.color.push(colorOne)
-    player.object.push(objectOne)
+    player.nameHeader.push(name)
+    player.place.push(place)
+    player.fruit.push(fruit)
+    player.color.push(color)
+    player.object.push(object)
     player.save({ validateBeforeSave: false })
-
-    console.log('gameId', gameId)
     io.to(gameId).emit('stop')
-    console.log('stop')
     } catch (error) {
       console.log(error.message);
     }
+})
+
+socket.on('answers_not_submitted', ({name, place, fruit, color, object})=> {
+  console.log('name desde answers_not_submitted', name)
 })
 
 
