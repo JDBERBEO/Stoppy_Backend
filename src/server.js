@@ -6,6 +6,7 @@ const morgan = require('morgan');
 const connect = require('./database/db');
 const playerRouter = require('./routes/playerRoutes')
 const Game = require("./models/gameModel");
+const Player = require('./models/playerModel')
 const { create, findById } = require('./models/gameModel');
 const { Socket } = require('dgram');
 const jwt = require("jsonwebtoken");
@@ -23,10 +24,9 @@ app.use(express.json());
 app.use(morgan("dev"));
 app.use('/players', playerRouter)
 
-const id = 1
+
 io.on('connection', socket => {
 
-  // let newGameId = ""
 socket.on('createGame', async({token}) => {
     console.log('token', token)
     const {userId} = jwt.verify(token, "" + process.env.SECRET)
@@ -45,44 +45,46 @@ socket.on('joinGame', (gameId) => {
   console.log('gameId', gameId)
   io.to(gameId).emit('joined')
   socket.join(gameId)
-  socket.on('playerToken', async({token}) => {
-    console.log('joingame token', token)
+})
+
+socket.on('playerToken', async({token, gameId}) => {
+  console.log('joingame token', token)
+  const {userId} = jwt.verify(token, "" + process.env.SECRET)
+  const game = await Game.findById(gameId)
+  game.players.push(userId)
+  await game.save()
+  console.log('Game', game)
+})
+
+socket.on('rejoined', (gameId) => {
+  console.log('llego rejoined')
+  socket.join(gameId)
+})
+
+socket.on('round', async ({name, place, fruit, color, object, token, gameId }) => { 
+  try {
     const {userId} = jwt.verify(token, "" + process.env.SECRET)
-    const game = await Game.findById(gameId)
-    game.players.push(userId)
-    await game.save()
-    console.log('Game', game)
-  })
-  //agregar un socket cpara hacer un push a la base de datos del player que se une
+    const player = await Player.findById(userId)
+    
+    player.nameHeader.push(name)
+    player.place.push(place)
+    player.fruit.push(fruit)
+    player.color.push(color)
+    player.object.push(object)
+    player.save({ validateBeforeSave: false })
+    io.to(gameId).emit('stop')
+    } catch (error) {
+      console.log(error.message);
+    }
+})
+
+socket.on('answers_not_submitted', ({name, place, fruit, color, object})=> {
+  console.log('name desde answers_not_submitted', name)
 })
 
 
-
-// console.log('newgame por fuera de creategame', newGame)
-// socket.emit('gameId', {gameId: Date.now()})
-
-// let gameId = ''
-// socket.on('roundOne', async (data) => { 
-//     try {
-//       console.log('data', data)
-//       const roundOne = await Round.create({data})
-//       console.log('roundOne', roundOne)
-//       roundOne.name.push(data.nameOne)
-//       roundOne.place.push(data.placeOne)
-//       roundOne.fruit.push(data.fruitOne)
-//       roundOne.color.push(data.colorOne)
-//       roundOne.object.push(data.objectOne)
-//       console.log('roundOne luego del push', roundOne)
-//       roundOne.save()
-//       console.log('Gameid', roundOne._id)
-//       gameId = roundOne._id
-//     } catch (error) {
-//       console.log(err.message);
-//     }
-// })
-
 // socket.on('roundTwo', async (data) => { 
-//   try {
+  //   try {
 //     const game = await Round.findById(gameId)
 //     console.log('game', game)
 //     game.name.push(data.nameTwo)
