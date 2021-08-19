@@ -78,8 +78,19 @@ socket.on('round', async ({name, place, fruit, color, object, token, gameId }) =
     }
 })
 
-socket.on('answers_not_submitted', ({name, place, fruit, color, object})=> {
+socket.on('answers_not_submitted', async ({name, place, fruit, color, object, token, gameId})=> {
   console.log('name desde answers_not_submitted', name)
+  const {userId} = jwt.verify(token, "" + process.env.SECRET)
+    const player = await Player.findById(userId)
+    
+    player.nameHeader.push(name)
+    player.place.push(place)
+    player.fruit.push(fruit)
+    player.color.push(color)
+    player.object.push(object)
+    player.save({ validateBeforeSave: false })
+
+    console.log('player desde anserw not submitted', player)
 })
 
 
