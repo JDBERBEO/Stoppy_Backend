@@ -78,28 +78,45 @@ socket.on('round', async ({name, place, fruit, color, object, token, gameId, rou
     }
 })
 
-socket.on('answers_not_submitted', async ({name, place, fruit, color, object, token, gameId})=> {
-  console.log('name desde answers_not_submitted', name)
+socket.on('answers_not_submitted', async ({name, place, fruit, color, object, token, gameId, round})=> {
+  console.log('round desde answers_not_submitted', round)
   const {userId} = jwt.verify(token, "" + process.env.SECRET)
     const player = await Player.findById(userId)
+
+    // player.nameHeader.push(name) 
+    // player.place.push(place)
+    // player.fruit.push(fruit)
+    // player.color.push(color)
+    // player.object.push(object)
+
+    player.nameHeader[round] = name
+    player.place[round] = place
+    player.fruit[round] = fruit
+    player.color[round] = color
+    player.object[round] = object
     
-    player.nameHeader.push(name)
-    player.place.push(place)
-    player.fruit.push(fruit)
-    player.color.push(color)
-    player.object.push(object)
     player.save({ validateBeforeSave: false })
-    // console.log('player desde anserw not submitted', player)
+    player.markModified('nameHeader')
+    player.markModified('place')
+    player.markModified('fruit')
+    player.markModified('color')
+    player.markModified('object')
+    // .then((player)=>{
+    //   console.log('player desde then', player)
+    // }).catch((error) =>{
+    //   console.log('error catch', error)
+    // })
+
+    console.log('player desde anserw not submitted', player)
 })
 
-socket.on('bring_all_answers', async ({gameId}) =>{
+// socket.on('bring_all_answers', async ({gameId}) =>{
 
-  const game = await Game.findById(gameId).populate("player")
+//   const game = await Game.findById(gameId).populate("players")
 
-  console.log('game desde bring all answers: ', game )
-  io.to(gameId).emit('send_answers', ({game}))
-  //encontrar el juego en 
-})
+//   console.log('game desde bring all answers: ', game )
+//   io.to(gameId).emit('send_answers', ({game}))
+// })
 
 
 // socket.on('roundTwo', async (data) => { 
