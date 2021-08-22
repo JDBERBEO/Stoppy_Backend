@@ -5,6 +5,7 @@ const http = require('http')
 const morgan = require('morgan');
 const connect = require('./database/db');
 const playerRouter = require('./routes/playerRoutes')
+const gameRouter = require('./routes/gameRoutes')
 const Game = require("./models/gameModel");
 const Player = require('./models/playerModel')
 const jwt = require("jsonwebtoken");
@@ -21,6 +22,7 @@ const io = SocketIO(server, {
 app.use(express.json());
 app.use(morgan("dev"));
 app.use('/players', playerRouter)
+app.use('/games', gameRouter)
 
 
 io.on('connection', socket => {
@@ -95,28 +97,27 @@ socket.on('answers_not_submitted', async ({name, place, fruit, color, object, to
     player.color[round] = color
     player.object[round] = object
     
-    player.save({ validateBeforeSave: false })
     player.markModified('nameHeader')
     player.markModified('place')
     player.markModified('fruit')
     player.markModified('color')
     player.markModified('object')
-    // .then((player)=>{
-    //   console.log('player desde then', player)
-    // }).catch((error) =>{
-    //   console.log('error catch', error)
-    // })
-
-    console.log('player desde anserw not submitted', player)
+    player.save({ validateBeforeSave: false })
+    .then(()=>{
+      return Game.findById(gameId).populate("players")
+    }).then((game) =>{
+      io.to(gameId).emit('send_answers', ({game}))
+      console.log('game desde answers not submitted', game)
+    }).catch((error) =>{
+      console.log('error catch', error)
+    })
+   
 })
 
-// socket.on('bring_all_answers', async ({gameId}) =>{
+socket.on('bring_all_answers', async ({gameId}) =>{
 
-//   const game = await Game.findById(gameId).populate("players")
-
-//   console.log('game desde bring all answers: ', game )
-//   io.to(gameId).emit('send_answers', ({game}))
-// })
+  
+})
 
 
 // socket.on('roundTwo', async (data) => { 

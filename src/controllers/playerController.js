@@ -39,7 +39,7 @@ module.exports = {
           expiresIn: 60 * 60 * 24 * 365,
         });
   
-        res.status(201).json({token});
+        res.status(201).json({token, playerId: player._id});
       } catch (error) {
         console.log("ERROR", error.message);
   
