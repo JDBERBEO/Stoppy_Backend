@@ -1,6 +1,8 @@
 const Game = require("../models/gameModel");
+const Player = require("../models/playerModel")
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const { findById } = require("../models/gameModel");
 
 module.exports = {
   async showOne(req, res) {
@@ -21,14 +23,20 @@ module.exports = {
     try {
       const { body } = req
       
-      //push del score
-      //save del score
-      //gameid se hace el find by id y se saca el total de jugadores 
-      // const totalRoundScore = 
-      // roundScores / players.length
-      // se puede hacer un update de la propiedad score o crear una nueva??
- 
+      console.log('body', body)
+      
+      const playerBeingScored = await Player.findById(body.playerIdBeingScored)
+      console.log('player_Being_Scored antes', playerBeingScored)
+      playerBeingScored.ScorePerRound[body.round] += body.roundScore
+      console.log('player_Being_Scored.ScorePerRound[body.round]: ', playerBeingScored.ScorePerRound[body.round] )
+      playerBeingScored.save({ validateBeforeSave: false })
+      //find del player
+      //player.score += nuevo score que llega
+      //save 
+      console.log('playerBeingScored', playerBeingScored)
+      res.status(200).json({ message: 'success' });
     } catch (err) {
+      console.log('error: ', err)
       res.status(400).json({ message: err.message });
     }
   },

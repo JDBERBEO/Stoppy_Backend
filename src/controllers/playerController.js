@@ -26,13 +26,13 @@ module.exports = {
         const player = await Player.findOne({ email });
   
         if (!player) {
-          throw new Error("Password or invalid email");
+          throw new Error("Password or email invalid");
         }
   
         const isValid = await bcrypt.compare(password, player.password);
   
         if (!isValid) {
-          throw new Error("Password or invalid email");
+          throw new Error("Password or email invalid");
         }
   
         const token = jwt.sign({ userId: player._id }, process.env.SECRET, {
