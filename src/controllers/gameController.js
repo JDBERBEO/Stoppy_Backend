@@ -30,9 +30,7 @@ module.exports = {
       playerBeingScored.ScorePerRound[body.round] += body.roundScore
       console.log('player_Being_Scored.ScorePerRound[body.round]: ', playerBeingScored.ScorePerRound[body.round] )
       playerBeingScored.save({ validateBeforeSave: false })
-      //find del player
-      //player.score += nuevo score que llega
-      //save 
+      //si results son igual al numero de jugadores, hacer un emit con el score 
       console.log('playerBeingScored', playerBeingScored)
       res.status(200).json({ message: 'success' });
     } catch (err) {

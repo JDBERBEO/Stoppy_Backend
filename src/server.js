@@ -32,7 +32,7 @@ socket.on('createGame', async({token, randomlettersArray}, ) => {
     console.log('randomletters', randomlettersArray)
     const {userId} = jwt.verify(token, "" + process.env.SECRET)
     // console.log('playerid', userId)
-    const newGame = await Game.create({letters : randomlettersArray})
+    const newGame = await Game.create({letters : randomlettersArray, results : [0,0,0,0,0]})
     newGame.players.push(userId)
     await newGame.save()
     console.log('newGame', newGame)

@@ -54,7 +54,9 @@ const playerSchema = new Schema(
       },
       ScorePerRound: {
           type: [Number],
-          default: [0,0,0,0,0]
+      },
+      totalscore: {
+        type: Number
       }
   })
 
@@ -62,6 +64,7 @@ playerSchema.pre('save', async function () {
   if (this.password && this.isModified('password')) {
     this.password = await bcrypt.hash(this.password, 8)
   }
+  
 })
 const Player = model('Player', playerSchema)
 module.exports = Player
