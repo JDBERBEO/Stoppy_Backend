@@ -27,11 +27,12 @@ app.use('/games', gameRouter)
 
 io.on('connection', socket => {
 
-socket.on('createGame', async({token}) => {
-    // console.log('token', token)
+socket.on('createGame', async({token, randomlettersArray}, ) => {
+    console.log('token', token)
+    console.log('randomletters', randomlettersArray)
     const {userId} = jwt.verify(token, "" + process.env.SECRET)
     // console.log('playerid', userId)
-    const newGame = await Game.create({})
+    const newGame = await Game.create({letters : randomlettersArray})
     newGame.players.push(userId)
     await newGame.save()
     console.log('newGame', newGame)
@@ -63,16 +64,6 @@ socket.on('rejoined', (gameId) => {
 
 socket.on('round', async ({name, place, fruit, color, object, token, gameId, round }) => { 
   try {
-    // const {userId} = jwt.verify(token, "" + process.env.SECRET)
-    // const player = await Player.findById(userId)
-    
-    // player.nameHeader[round] = name
-    // player.place[round] = place
-    // player.fruit[round] = fruit
-    // player.color[round] = color
-    // player.object[round] = object
-    // player.save({ validateBeforeSave: false })
-    // console.log('player desde round', player)
     io.to(gameId).emit('stop')
 
     } catch (error) {

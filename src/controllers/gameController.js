@@ -2,7 +2,7 @@ const Game = require("../models/gameModel");
 const Player = require("../models/playerModel")
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const { findById } = require("../models/gameModel");
+
 
 module.exports = {
   async showOne(req, res) {
