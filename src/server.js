@@ -105,10 +105,9 @@ socket.on('answers_not_submitted', async ({name, place, fruit, color, object, to
    
 })
 
-// socket.on('bring_all_answers', async ({gameId}) =>{
-
-  
-// })
+socket.on('startGame', ({gameId}) =>{
+  io.to(gameId).emit('gameStarting')
+})
 
 })
 

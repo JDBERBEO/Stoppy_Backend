@@ -23,12 +23,15 @@ module.exports = {
     try {
       const { body } = req
       
-      console.log('body', body)
+      console.log('body roundScore', body.roundScore)
+
+      const integer = parseInt(body.roundScore);
       
       const playerBeingScored = await Player.findById(body.playerIdBeingScored)
-      console.log('player_Being_Scored antes', playerBeingScored)
-      playerBeingScored.ScorePerRound[body.round] += body.roundScore
+      console.log('playerBeingScored ANTES: ', playerBeingScored)
+      playerBeingScored.ScorePerRound[body.round] += integer
       console.log('player_Being_Scored.ScorePerRound[body.round]: ', playerBeingScored.ScorePerRound[body.round] )
+      playerBeingScored.markModified('ScorePerRound')
       playerBeingScored.save({ validateBeforeSave: false })
       //si results son igual al numero de jugadores, hacer un emit con el score 
       console.log('playerBeingScored', playerBeingScored)

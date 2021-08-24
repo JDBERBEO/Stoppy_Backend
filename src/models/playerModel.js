@@ -54,10 +54,8 @@ const playerSchema = new Schema(
       },
       ScorePerRound: {
           type: [Number],
+          default: [0,0,0,0,0]
       },
-      totalscore: {
-        type: Number
-      }
   })
 
 playerSchema.pre('save', async function () {
