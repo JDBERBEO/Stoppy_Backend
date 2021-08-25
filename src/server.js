@@ -26,8 +26,7 @@ app.use('/games', gameRouter)
 io.on('connection', socket => {
 
 socket.on('createGame', async({token, randomlettersArray}, ) => {
-    console.log('token', token)
-    console.log('randomletters', randomlettersArray)
+
     const {userId} = jwt.verify(token, "" + process.env.SECRET)
     // console.log('playerid', userId)
     const newGame = await Game.create({letters : randomlettersArray})
@@ -42,7 +41,7 @@ socket.on('createGame', async({token, randomlettersArray}, ) => {
 
 socket.on('joinGame', (gameId) => {
   // console.log('gameId', gameId)
-  io.to(gameId).emit('joined')
+  
   socket.join(gameId)
 })
 
@@ -52,7 +51,10 @@ socket.on('playerToken', async({token, gameId}) => {
   const game = await Game.findById(gameId)
   game.players.push(userId)
   await game.save()
-  // console.log('Game', game)
+
+  const updatedGame = await Game.findById(gameId).populate('players')
+  console.log('gameplayers playetoken: ', updatedGame)
+  io.to(gameId).emit('joined', updatedGame.players)
 })
 
 socket.on('rejoined', (gameId) => {
@@ -103,9 +105,10 @@ socket.on('answers_not_submitted', async ({name, place, fruit, color, object, to
    
 })
 
-// socket.on('startGame', ({gameId}) =>{
-//   io.to(gameId).emit('gameStarting')
-// })
+socket.on('startGame', (gameId) =>{
+  console.log('startgame', gameId)
+  io.to(gameId).emit('gameStarting')
+})
 
 })
 
