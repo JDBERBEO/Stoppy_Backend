@@ -56,6 +56,9 @@ const playerSchema = new Schema(
           type: [Number],
           default: [0,0,0,0,0]
       },
+      results: {
+          type: [Number],
+          default: [0,0,0,0,0]}
   })
 
 playerSchema.pre('save', async function () {

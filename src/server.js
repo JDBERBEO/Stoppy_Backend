@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express')
-const SocketIO = require('socket.io')
+const SocketIO = require('./utils/socket')
 const http = require('http')
 const morgan = require('morgan');
 const connect = require('./database/db');
@@ -9,15 +9,13 @@ const gameRouter = require('./routes/gameRoutes')
 const Game = require("./models/gameModel");
 const Player = require('./models/playerModel')
 const jwt = require("jsonwebtoken");
+const { Socket } = require('dgram');
 
 const port = 8000
 const app = express()
 const server = http.createServer(app)
-const io = SocketIO(server, {
-  cors: {
-    origin: '*'
-  }
-})
+SocketIO.init(server)
+const io = SocketIO.getIO()
 
 app.use(express.json());
 app.use(morgan("dev"));
@@ -32,7 +30,7 @@ socket.on('createGame', async({token, randomlettersArray}, ) => {
     console.log('randomletters', randomlettersArray)
     const {userId} = jwt.verify(token, "" + process.env.SECRET)
     // console.log('playerid', userId)
-    const newGame = await Game.create({letters : randomlettersArray, results : [0,0,0,0,0]})
+    const newGame = await Game.create({letters : randomlettersArray})
     newGame.players.push(userId)
     await newGame.save()
     console.log('newGame', newGame)
@@ -105,9 +103,9 @@ socket.on('answers_not_submitted', async ({name, place, fruit, color, object, to
    
 })
 
-socket.on('startGame', ({gameId}) =>{
-  io.to(gameId).emit('gameStarting')
-})
+// socket.on('startGame', ({gameId}) =>{
+//   io.to(gameId).emit('gameStarting')
+// })
 
 })
 
