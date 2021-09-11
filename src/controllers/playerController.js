@@ -6,16 +6,13 @@ module.exports = {
     async signup(req, res) {
       try {
         const { body } = req
-        console.log('body', body)
         const player = await Player.create(body)
         
         const token = jwt.sign({ userId: player._id }, process.env.SECRET, {
           expiresIn: 60 * 60 * 24 * 365,
         });
-        console.log('token', token)
         res.status(201).json({token});
       } catch (error) {
-        console.log('error', error.message)
         res.status(400).json({ message: error.message });
       }
       },
@@ -41,8 +38,6 @@ module.exports = {
   
         res.status(201).json({token, playerId: player._id});
       } catch (error) {
-        console.log("ERROR", error.message);
-  
         res.status(400).json({ message: error.message });
       }
       },
