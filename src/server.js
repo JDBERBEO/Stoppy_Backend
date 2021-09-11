@@ -28,11 +28,11 @@ io.on('connection', socket => {
 socket.on('createGame', async({token, randomlettersArray}, ) => {
 
     const {userId} = jwt.verify(token, "" + process.env.SECRET)
-    // console.log('playerid', userId)
+
     const newGame = await Game.create({letters : randomlettersArray})
     newGame.players.push(userId)
     await newGame.save()
-    console.log('newGame', newGame)
+
     const newGameId = newGame._id.toString()
     socket.join(newGameId)
     socket.emit('gameId', newGameId)
@@ -40,25 +40,20 @@ socket.on('createGame', async({token, randomlettersArray}, ) => {
 )
 
 socket.on('joinGame', (gameId) => {
-  // console.log('gameId', gameId)
-  
   socket.join(gameId)
 })
 
 socket.on('playerToken', async({token, gameId}) => {
-  console.log('joingame token', token)
+
   const {userId} = jwt.verify(token, "" + process.env.SECRET)
   const game = await Game.findById(gameId)
   game.players.push(userId)
   await game.save()
-
   const updatedGame = await Game.findById(gameId).populate('players')
-  console.log('gameplayers playetoken: ', updatedGame)
   io.to(gameId).emit('joined', updatedGame.players)
 })
 
 socket.on('rejoined', (gameId) => {
-  console.log('llego rejoined')
   socket.join(gameId)
 })
 
@@ -72,15 +67,8 @@ socket.on('round', async ({name, place, fruit, color, object, token, gameId, rou
 })
 
 socket.on('answers_not_submitted', async ({name, place, fruit, color, object, token, gameId, round})=> {
-  console.log('round desde answers_not_submitted', round)
   const {userId} = jwt.verify(token, "" + process.env.SECRET)
     const player = await Player.findById(userId)
-
-    // player.nameHeader.push(name) 
-    // player.place.push(place)
-    // player.fruit.push(fruit)
-    // player.color.push(color)
-    // player.object.push(object)
 
     player.nameHeader[round] = name
     player.place[round] = place
@@ -98,7 +86,7 @@ socket.on('answers_not_submitted', async ({name, place, fruit, color, object, to
       return Game.findById(gameId).populate("players")
     }).then((game) =>{
       io.to(gameId).emit('send_answers', ({game}))
-      console.log('game desde answers not submitted', game)
+
     }).catch((error) =>{
       console.log('error catch', error)
     })
@@ -106,17 +94,12 @@ socket.on('answers_not_submitted', async ({name, place, fruit, color, object, to
 })
 
 socket.on('startGame', (gameId) =>{
-  console.log('startgame', gameId)
   io.to(gameId).emit('gameStarting')
 })
 
 })
 
-
 connect ()
-// app.get('/', () => {
-//   console.log('hola mundo')
-// })
 
 server.listen(port, () => {
   console.log(`App running at http://localhost:${port}`)
